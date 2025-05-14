@@ -63,8 +63,8 @@
         return;
       }
 
-      const distanzaTotale = km * 2;
-      const tempoTotale = minuti * 2;
+      const distanzaTotale = km * 2;  // Andata e ritorno
+      const tempoTotale = minuti * 2;  // Andata e ritorno
       const costoCarburante = distanzaTotale * costoConsumo;
       const guadagno = (km * guadagnoKm) + (minuti * guadagnoMin);
       const tariffaTotale = guadagno + costoCarburante;
@@ -81,6 +81,7 @@
       const minutiOra = String(now.getMinutes()).padStart(2, '0');
       const timestamp = `${giorno}/${mese}/${anno} ${ore}:${minutiOra}`;
 
+      // Aggiungi voce alla cronologia con carburante incluso
       const voce = document.createElement("li");
       voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong> <span class='consumo'>(Carburante: €${costoCarburante.toFixed(2)})</span><br><em>[${timestamp}]</em>`;
       document.getElementById("cronologia").appendChild(voce);
