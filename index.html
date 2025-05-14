@@ -8,6 +8,7 @@
     body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; }
     input { margin: 5px 0; padding: 5px; width: 100%; }
     button { margin-top: 10px; padding: 10px; width: 100%; font-weight: bold; }
+    .result { margin-top: 15px; font-size: 2em; font-weight: bold; text-align: center; }
     ul { list-style: none; padding: 0; }
     li { margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
     .consumo { color: gray; font-size: 0.9em; }
@@ -37,7 +38,8 @@
   <input type="number" id="minuti" step="1" />
 
   <button onclick="calcolaTariffa()">Calcola</button>
-  <p id="risultato"></p>
+
+  <div id="risultato" class="result"></div>
 
   <h2>Cronologia corse</h2>
   <ul id="cronologia"></ul>
@@ -67,10 +69,10 @@
       const guadagno = (km * guadagnoKm) + (minuti * guadagnoMin);
       const tariffaTotale = guadagno + costoCarburante;
 
-      const risultato = `Tariffa: €${tariffaTotale.toFixed(2)} (Guadagno netto: €${guadagno.toFixed(2)} + Carburante: €${costoCarburante.toFixed(2)})`;
-      document.getElementById("risultato").textContent = risultato;
+      // Visualizza solo il risultato finale grande
+      document.getElementById("risultato").textContent = `€${tariffaTotale.toFixed(2)}`;
 
-      // Aggiungi data e ora
+      // Aggiungi data e ora alla cronologia
       const now = new Date();
       const giorno = String(now.getDate()).padStart(2, '0');
       const mese = String(now.getMonth() + 1).padStart(2, '0');
@@ -80,7 +82,7 @@
       const timestamp = `${giorno}/${mese}/${anno} ${ore}:${minutiOra}`;
 
       const voce = document.createElement("li");
-      voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong> <span class='consumo'>(Carburante: €${costoCarburante.toFixed(2)})</span><br><em>[${timestamp}]</em>`;
+      voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong><br><em>[${timestamp}]</em>`;
       document.getElementById("cronologia").appendChild(voce);
     }
 
