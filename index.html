@@ -72,7 +72,7 @@
       // Visualizza solo il risultato finale grande
       document.getElementById("risultato").textContent = `€${tariffaTotale.toFixed(2)}`;
 
-      // Aggiungi data e ora alla cronologia
+      // Aggiungi data e ora alla cronologia, includendo il carburante
       const now = new Date();
       const giorno = String(now.getDate()).padStart(2, '0');
       const mese = String(now.getMonth() + 1).padStart(2, '0');
@@ -82,7 +82,7 @@
       const timestamp = `${giorno}/${mese}/${anno} ${ore}:${minutiOra}`;
 
       const voce = document.createElement("li");
-      voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong><br><em>[${timestamp}]</em>`;
+      voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong> <span class='consumo'>(Carburante: €${costoCarburante.toFixed(2)})</span><br><em>[${timestamp}]</em>`;
       document.getElementById("cronologia").appendChild(voce);
     }
 
