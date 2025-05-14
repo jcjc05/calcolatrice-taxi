@@ -3,73 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calcolatrice Tariffa Notturna</title>
+  <title>Calcolatrice Taxi Notturno</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
-    h1 { font-size: 1.5rem; text-align: center; }
-    input, select { width: 100%; padding: 10px; margin: 10px 0; font-size: 1rem; }
-    button { padding: 10px; width: 100%; font-size: 1rem; cursor: pointer; }
-    .result { margin-top: 20px; font-size: 1.2rem; text-align: center; font-weight: bold; }
-    .history { margin-top: 30px; }
-    .history h2 { font-size: 1.2rem; }
-    .history ul { list-style-type: none; padding-left: 0; }
-    .history li { background: #f0f0f0; margin: 5px 0; padding: 10px; border-radius: 5px; font-size: 0.95rem; }
-    .consumo { font-style: italic; color: #555; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    input, button { margin: 5px 0; padding: 8px; width: 100%; max-width: 300px; }
+    .result { margin-top: 15px; font-weight: bold; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 5px; }
+    .consumo { font-size: 0.9em; color: #555; }
+    .sezione { margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
-  <h1>Calcolatrice Tariffa Notturna</h1>
+  <h1>Calcolatrice Taxi Notturno</h1>
 
-  <label for="km">Distanza (km):</label>
-  <input type="number" id="km" placeholder="Es. 5" step="0.1">
+  <button onclick="toggleParametri()">Mostra/Nascondi Parametri Tariffa</button>
 
-  <label for="min">Tempo (minuti):</label>
-  <input type="number" id="min" placeholder="Es. 10" step="1">
+  <div id="parametri" style="display: none; margin-top: 10px;">
+    <h2>Parametri Tariffa</h2>
+    <label for="costoConsumo">Consumo auto (€/km):</label>
+    <input type="number" id="costoConsumo" value="0.30" step="0.01">
 
-  <h2>Parametri Tariffa</h2>
-  <label for="costoConsumo">Consumo auto (€/km):</label>
-  <input type="number" id="costoConsumo" value="0.30" step="0.01">
+    <label for="guadagnoKm">Guadagno per km (€/km):</label>
+    <input type="number" id="guadagnoKm" value="1.00" step="0.01">
 
-  <label for="guadagnoKm">Guadagno per km (€/km):</label>
-  <input type="number" id="guadagnoKm" value="1.00" step="0.01">
+    <label for="guadagnoMin">Guadagno per minuto (€/min):</label>
+    <input type="number" id="guadagnoMin" value="0.27" step="0.01">
+  </div>
 
-  <label for="guadagnoMin">Guadagno per minuto (€/min):</label>
-  <input type="number" id="guadagnoMin" value="0.27" step="0.01">
+  <div class="sezione">
+    <h2>Calcolo Corsa</h2>
+    <label for="km">Distanza (solo andata) in km:</label>
+    <input type="number" id="km" step="0.1">
 
-  <button onclick="calcolaTariffa()">Calcola Tariffa</button>
-  <button onclick="cancellaCronologia()">Cancella Cronologia</button>
+    <label for="minuti">Durata (solo andata) in minuti:</label>
+    <input type="number" id="minuti" step="1">
 
-  <div class="result" id="risultato"></div>
+    <button onclick="calcolaTariffa()">Calcola Tariffa</button>
+    <div class="result" id="risultato"></div>
+  </div>
 
-  <div class="history">
+  <div class="sezione">
     <h2>Cronologia Corse</h2>
-    <ul id="storico"></ul>
+    <button onclick="cancellaCronologia()">Cancella Cronologia</button>
+    <ul id="cronologia"></ul>
   </div>
 
   <script>
+    const consumoAutoKm = 1 / 14; // 1 litro per 14 km
+
+    function toggleParametri() {
+      const parametri = document.getElementById("parametri");
+      parametri.style.display = parametri.style.display === "none" ? "block" : "none";
+    }
+
     function calcolaTariffa() {
-      const km = parseFloat(document.getElementById('km').value) || 0;
-      const minuti = parseFloat(document.getElementById('min').value) || 0;
-      const consumo = parseFloat(document.getElementById('costoConsumo').value) || 0;
-      const guadagnoKm = parseFloat(document.getElementById('guadagnoKm').value) || 0;
-      const guadagnoMin = parseFloat(document.getElementById('guadagnoMin').value) || 0;
+      const km = parseFloat(document.getElementById("km").value);
+      const minuti = parseFloat(document.getElementById("minuti").value);
+      const costoConsumo = parseFloat(document.getElementById("costoConsumo").value);
+      const guadagnoKm = parseFloat(document.getElementById("guadagnoKm").value);
+      const guadagnoMin = parseFloat(document.getElementById("guadagnoMin").value);
 
-      const totale = ((consumo + guadagnoKm) * km + guadagnoMin * minuti).toFixed(2);
-      const consumoCarburante = (consumo * km * 2).toFixed(2); // Andata e ritorno
-      document.getElementById('risultato').textContent = `Tariffa: € ${totale}`;
+      if (isNaN(km) || isNaN(minuti)) {
+        alert("Inserisci distanza e durata valide.");
+        return;
+      }
 
-      const voce = `Distanza: ${km} km, Tempo: ${minuti} min → € ${totale}`;
-      const li = document.createElement('li');
-      li.textContent = voce;
-      const consumoLi = document.createElement('p');
-      consumoLi.classList.add('consumo');
-      consumoLi.textContent = `Consumo carburante: € ${consumoCarburante}`;
-      li.appendChild(consumoLi);
-      document.getElementById('storico').prepend(li);
+      const distanzaTotale = km * 2;
+      const tempoTotale = minuti * 2;
+      const costoCarburante = distanzaTotale * consumoAutoKm * costoConsumo;
+      const guadagno = (km * guadagnoKm) + (minuti * guadagnoMin);
+      const tariffaTotale = guadagno + costoCarburante;
+
+      const risultato = `Tariffa: €${tariffaTotale.toFixed(2)} (Guadagno netto: €${guadagno.toFixed(2)} + Carburante: €${costoCarburante.toFixed(2)})`;
+      document.getElementById("risultato").textContent = risultato;
+
+      const voce = document.createElement("li");
+      voce.innerHTML = `Corsa di ${km} km e ${minuti} minuti → <strong>€${tariffaTotale.toFixed(2)}</strong> <span class='consumo'>(Carburante: €${costoCarburante.toFixed(2)})</span>`;
+      document.getElementById("cronologia").appendChild(voce);
     }
 
     function cancellaCronologia() {
-      document.getElementById('storico').innerHTML = '';
+      document.getElementById("cronologia").innerHTML = "";
     }
   </script>
 </body>
